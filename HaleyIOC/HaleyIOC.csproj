@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Haley.IOC</AssemblyName>
+    <RootNamespace>Haley.IOC</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Lingam</Authors>
+    <Company>TheHaleyProject</Company>
+    <Description>Simple IOC Container which implements Dependency Injection</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/rmsmech/HaleyIOC</PackageProjectUrl>
+	  <IncludeSymbols>true</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <PackageIcon>Haley.png</PackageIcon>
+	  <PackageReleaseNotes>Changed Namespaces</PackageReleaseNotes>
+	  <RepositoryUrl>https://github.com/rmsmech/HaleyIOC</RepositoryUrl>
+	  <RepositoryType>GIT</RepositoryType>
+	  <SignAssembly>true</SignAssembly>
+	  <AssemblyOriginatorKeyFile>HaleyProject.snk</AssemblyOriginatorKeyFile>
+	  <AssemblyVersion>2.0.2.0</AssemblyVersion>
+	  <FileVersion>2.0.2.0</FileVersion>
+	  <PackageTags>IOC, DependencyInjection, DI</PackageTags>
+	  <Version>2.0.2</Version>
+  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>portable</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+	</PropertyGroup>
+	<ItemGroup>
+	  <None Include="..\Haley.png">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
+	</ItemGroup>
+	<Import Project="$(SolutionDir)ProjectReferences_$(SolutionName).txt" Condition="Exists('$(SolutionDir)ProjectReferences_$(SolutionName).txt')" />
+<Choose>
+    <When Condition="Exists($(HaleyExtensions))">
+      <ItemGroup>
+        <ProjectReference Include="$(HaleyExtensions)\HaleyExtensions.csproj">
+          <Name>HaleyExtensions</Name>
+        </ProjectReference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+     <ItemGroup>
+       <PackageReference Include="Haley.Extensions" Version="2.0.1" />
+	 </ItemGroup>
+    </Otherwise>
+</Choose>  
+</Project>
