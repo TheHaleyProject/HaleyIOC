@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HaleyIOC", "HaleyIOC.csproj", "{7B7C1B4A-B129-43A8-8957-6EB11EC76BC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HaleyIOC", "HaleyIOC/HaleyIOC.csproj", "{7B7C1B4A-B129-43A8-8957-6EB11EC76BC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
