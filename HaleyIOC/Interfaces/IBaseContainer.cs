@@ -6,13 +6,14 @@ namespace Haley.Abstractions
 {
     public interface IBaseContainer
     {
+        string Id { get; }
         bool ignore_if_registered { get; set; }
         bool overwrite_if_registered { get; set; }
 
         #region Validation Methods
-        (bool status, Type registered_type, string message,RegisterMode mode) checkIfRegistered(Type contract_type,string priority_key);
-        (bool status, Type registered_type, string message, RegisterMode mode) checkIfRegistered<TContract>(string priority_key);
-        (bool status, Type registered_type, string message, RegisterMode mode) checkIfRegistered(KeyBase key);
+        (bool status, Type registered_type, string message,RegisterMode mode) CheckIfRegistered(Type contract_type,string priority_key);
+        (bool status, Type registered_type, string message, RegisterMode mode) CheckIfRegistered<TContract>(string priority_key);
+        (bool status, Type registered_type, string message, RegisterMode mode) CheckIfRegistered(KeyBase key);
         #endregion
 
         #region Register Methods

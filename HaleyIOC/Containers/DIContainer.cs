@@ -18,6 +18,7 @@ namespace Haley.IOC
         #endregion
 
         #region Properties
+        public string Id { get;}
         public bool ignore_if_registered { get; set; }
         public bool overwrite_if_registered { get; set; }
         #endregion
@@ -44,7 +45,7 @@ namespace Haley.IOC
         }
         private bool _validateExistence(RegisterLoad register_load)
         {
-            var _status = checkIfRegistered(register_load.contract_type, register_load.priority_key);
+            var _status = CheckIfRegistered(register_load.contract_type, register_load.priority_key);
             //If registered and also ignore
             if (_status.status)
             {
@@ -433,7 +434,7 @@ namespace Haley.IOC
         #region PUBLIC METHODS
 
         #region Validations
-        public (bool status, Type registered_type, string message, RegisterMode mode) checkIfRegistered(KeyBase key)
+        public (bool status, Type registered_type, string message, RegisterMode mode) CheckIfRegistered(KeyBase key)
         {
             RegisterLoad _current_load = new RegisterLoad();
 
@@ -449,13 +450,13 @@ namespace Haley.IOC
 
             return (_is_registered, _current_load?.concrete_type, _message, _current_load.mode );
         }
-        public (bool status, Type registered_type, string message, RegisterMode mode) checkIfRegistered(Type contract_type, string priority_key)
+        public (bool status, Type registered_type, string message, RegisterMode mode) CheckIfRegistered(Type contract_type, string priority_key)
         {
-            return checkIfRegistered(new KeyBase(contract_type, priority_key));
+            return CheckIfRegistered(new KeyBase(contract_type, priority_key));
         }
-        public (bool status, Type registered_type, string message, RegisterMode mode) checkIfRegistered<Tcontract>(string priority_key)
+        public (bool status, Type registered_type, string message, RegisterMode mode) CheckIfRegistered<Tcontract>(string priority_key)
         {
-            return checkIfRegistered(typeof(Tcontract), priority_key);
+            return CheckIfRegistered(typeof(Tcontract), priority_key);
         }
 
         #endregion
@@ -770,6 +771,7 @@ namespace Haley.IOC
 
         public DIContainer() 
         {
+            Id = Guid.NewGuid().ToString();
             overwrite_if_registered = false;
             ignore_if_registered = false;
 
