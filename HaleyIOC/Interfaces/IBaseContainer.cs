@@ -4,7 +4,7 @@ using Haley.Models;
 
 namespace Haley.Abstractions
 {
-    public interface IHaleyDIContainer
+    public interface IBaseContainer
     {
         bool ignore_if_registered { get; set; }
         bool overwrite_if_registered { get; set; }
@@ -17,28 +17,28 @@ namespace Haley.Abstractions
 
         #region Register Methods
         void Register<TConcrete>(RegisterMode mode = RegisterMode.Singleton) where TConcrete : class;
-        void Register<TConcrete>(TConcrete instance) where TConcrete : class;
+        void Register<TConcrete>(TConcrete instance,bool forced_singleton= false) where TConcrete : class;
         void Register<TConcrete>(IMappingProvider dependencyProvider,MappingLevel mapping_level ) where TConcrete : class;
         void Register<TContract, TConcrete>(RegisterMode mode = RegisterMode.Singleton) where TConcrete : class, TContract;  //TImplementation should either implement or inherit from TContract
-        void Register<TContract, TConcrete>(TConcrete instance) where TConcrete : class, TContract;  //TImplementation should either implement or inherit from TContract
+        void Register<TContract, TConcrete>(TConcrete instance, bool forced_singleton = false) where TConcrete : class, TContract;  //TImplementation should either implement or inherit from TContract
         void Register<TContract, TConcrete>(IMappingProvider dependencyProvider, MappingLevel mapping_level) where TConcrete : class, TContract;  //TImplementation should either implement or inherit from TContract
         #endregion
 
         #region TryRegister Methods
         bool TryRegister<TConcrete>(RegisterMode mode = RegisterMode.Singleton) where TConcrete : class;
-        bool TryRegister<TConcrete>(TConcrete instance) where TConcrete : class;
+        bool TryRegister<TConcrete>(TConcrete instance, bool forced_singleton = false) where TConcrete : class;
         bool TryRegister<TConcrete>(IMappingProvider dependencyProvider, MappingLevel mapping_level) where TConcrete : class;
         bool TryRegister<TContract, TConcrete>(RegisterMode mode = RegisterMode.Singleton) where TConcrete : class, TContract;  //TImplementation should either implement or inherit from TContract
-        bool TryRegister<TContract, TConcrete>(TConcrete instance) where TConcrete : class, TContract;  //TImplementation should either implement or inherit from TContract
+        bool TryRegister<TContract, TConcrete>(TConcrete instance, bool forced_singleton = false) where TConcrete : class, TContract;  //TImplementation should either implement or inherit from TContract
         bool TryRegister<TContract, TConcrete>(IMappingProvider dependencyProvider, MappingLevel mapping_level) where TConcrete : class, TContract;  //TImplementation should either implement or inherit from TContract
         #endregion
 
         #region RegisterWithKey Methods
         bool RegisterWithKey<TConcrete>(string priority_key, RegisterMode mode = RegisterMode.Singleton) where TConcrete : class;
-        bool RegisterWithKey<TConcrete>(string priority_key, TConcrete instance) where TConcrete : class;
+        bool RegisterWithKey<TConcrete>(string priority_key, TConcrete instance, bool forced_singleton = false) where TConcrete : class;
         bool RegisterWithKey<TConcrete>(string priority_key, IMappingProvider dependencyProvider, MappingLevel mapping_level) where TConcrete : class;
         bool RegisterWithKey<TContract, TConcrete>(string priority_key, RegisterMode mode = RegisterMode.Singleton) where TConcrete : class, TContract;  //TImplementation should either implement or inherit from TContract
-        bool RegisterWithKey<TContract, TConcrete>(string priority_key, TConcrete instance) where TConcrete : class, TContract;  //TImplementation should either implement or inherit from TContract
+        bool RegisterWithKey<TContract, TConcrete>(string priority_key, TConcrete instance, bool forced_singleton = false) where TConcrete : class, TContract;  //TImplementation should either implement or inherit from TContract
         bool RegisterWithKey<TContract, TConcrete>(string priority_key, IMappingProvider dependencyProvider, MappingLevel mapping_level) where TConcrete : class, TContract;  //TImplementation should either implement or inherit from TContract
         #endregion
 

@@ -11,7 +11,7 @@ using Haley.Utils;
 
 namespace Haley.IOC
 {
-    public sealed class DIContainer : IHaleyDIContainer
+    public sealed class DIContainer : IBaseContainer
     {
         #region ATTRIBUTES
         private readonly ConcurrentDictionary<KeyBase, RegisterLoad> _mappings = new ConcurrentDictionary<KeyBase, RegisterLoad>();
@@ -323,6 +323,7 @@ namespace Haley.IOC
 
                 switch (_registered.load.mode)
                 {
+                    case RegisterMode.ForcedSingleton:
                     case RegisterMode.Singleton:
                         concrete_instance = _registered.load.concrete_instance;
                         break;
@@ -369,7 +370,14 @@ namespace Haley.IOC
             //If transient is not none, try to create new instance. If none, then go with as registered.
             if (resolve_load.transient_level != TransientCreationLevel.None)
             {
-                 concrete_instance = _createInstance(resolve_load,mapping_load);
+                //Before creating an instance, validate if this is forcedsingleton.
+                if (_registered.exists && _registered.load?.mode == RegisterMode.ForcedSingleton)
+                {
+                    concrete_instance = _registered.load.concrete_instance;
+                }
+
+                if (concrete_instance != null) return; //Meaning we managed to fill the value through forced singleton.
+                concrete_instance = _createInstance(resolve_load, mapping_load);
             }
             else
             {
@@ -457,9 +465,9 @@ namespace Haley.IOC
         {
             RegisterWithKey<TConcrete>(null, mode);
         }
-        public void Register<TConcrete>(TConcrete instance) where TConcrete : class
+        public void Register<TConcrete>(TConcrete instance, bool forced_singleton = false) where TConcrete : class
         {
-            RegisterWithKey(null, instance);
+            RegisterWithKey(null, instance,forced_singleton);
         }
         public void Register<TConcrete>(IMappingProvider dependencyProvider, MappingLevel mapping_level) where TConcrete : class
         {
@@ -469,9 +477,9 @@ namespace Haley.IOC
         {
             RegisterWithKey<TContract, TConcrete>(null, mode);
         }
-        public void Register<TContract, TConcrete>(TConcrete instance) where TConcrete : class, TContract
+        public void Register<TContract, TConcrete>(TConcrete instance, bool forced_singleton = false) where TConcrete : class, TContract
         {
-            RegisterWithKey<TContract, TConcrete>(null, instance);
+            RegisterWithKey<TContract, TConcrete>(null, instance,forced_singleton);
         }
         public void Register<TContract, TConcrete>(IMappingProvider dependencyProvider, MappingLevel mapping_level) where TConcrete : class, TContract
         {
@@ -492,11 +500,11 @@ namespace Haley.IOC
                 return false;
             }
         }
-        public bool TryRegister<TConcrete>(TConcrete instance) where TConcrete : class
+        public bool TryRegister<TConcrete>(TConcrete instance, bool forced_singleton = false) where TConcrete : class
         {
             try
             {
-                return RegisterWithKey(null, instance);
+                return RegisterWithKey(null, instance,forced_singleton);
             }
             catch (Exception)
             {
@@ -514,11 +522,11 @@ namespace Haley.IOC
                 return false;
             }
         }
-        public bool TryRegister<TContract, TConcrete>(TConcrete instance) where TConcrete : class, TContract
+        public bool TryRegister<TContract, TConcrete>(TConcrete instance, bool forced_singleton = false) where TConcrete : class, TContract
         {
             try
             {
-                return RegisterWithKey<TContract, TConcrete>(null, instance);
+                return RegisterWithKey<TContract, TConcrete>(null, instance,forced_singleton);
             }
             catch (Exception)
             {
@@ -558,11 +566,14 @@ namespace Haley.IOC
             //For this method, both contract and concrete type are same.
             return _register(_reg_load,_map_load);
         }
-        public bool RegisterWithKey<TConcrete>(string priority_key, TConcrete instance) where TConcrete : class
+        public bool RegisterWithKey<TConcrete>(string priority_key, TConcrete instance, bool forced_singleton = false) where TConcrete : class
         {
             //For this method, both contract and concrete type are same.
-            //If we have an instance, then obviously it is of singleton registration type.
-            RegisterLoad _reg_load = new RegisterLoad(RegisterMode.Singleton, priority_key, typeof(TConcrete), typeof(TConcrete), instance);
+            //If we have an instance, then obviously it is of singleton or forced singleton registration type.
+
+            var _regMode = RegisterMode.Singleton;
+            if (forced_singleton) _regMode = RegisterMode.ForcedSingleton;
+            RegisterLoad _reg_load = new RegisterLoad(_regMode, priority_key, typeof(TConcrete), typeof(TConcrete), instance);
             MappingLoad _map_load = new MappingLoad();
             return _register(_reg_load,_map_load);
         }
@@ -579,9 +590,11 @@ namespace Haley.IOC
             MappingLoad _map_load = new MappingLoad();
             return _register(_reg_load,_map_load);
         }
-        public bool RegisterWithKey<TContract, TConcrete>(string priority_key, TConcrete instance) where TConcrete : class, TContract
+        public bool RegisterWithKey<TContract, TConcrete>(string priority_key, TConcrete instance, bool forced_singleton = false) where TConcrete : class, TContract
         {
-            RegisterLoad _reg_load = new RegisterLoad(RegisterMode.Singleton, priority_key, typeof(TContract), typeof(TConcrete), instance);
+            var _regMode = RegisterMode.Singleton;
+            if (forced_singleton) _regMode = RegisterMode.ForcedSingleton;
+            RegisterLoad _reg_load = new RegisterLoad(_regMode, priority_key, typeof(TContract), typeof(TConcrete), instance);
             MappingLoad _map_load = new MappingLoad();
             return _register(_reg_load,_map_load);
         }
@@ -758,7 +771,10 @@ namespace Haley.IOC
         public DIContainer() 
         {
             overwrite_if_registered = false;
-            ignore_if_registered = false; 
+            ignore_if_registered = false;
+
+            //register self
+            this.Register<IBaseContainer, DIContainer>(this, true); //IHaleyContainer should be forced singleton. //We should never try to create an instance of this.
         }
     }
 }

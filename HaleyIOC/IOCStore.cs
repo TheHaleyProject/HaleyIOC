@@ -7,7 +7,7 @@ namespace Haley.IOC
 {
     public sealed class IOCStore
     {
-        public IHaleyDIContainer DI { get; }
+        public IBaseContainer DI { get; }
 
         public IOCStore()
         {
