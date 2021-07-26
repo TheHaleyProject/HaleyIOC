@@ -4,7 +4,7 @@ using Haley.Models;
 
 namespace Haley.Abstractions
 {
-    public interface IBaseContainer
+    public interface IBaseContainer : IServiceProvider
     {
         string Id { get; }
         bool ignore_if_registered { get; set; }

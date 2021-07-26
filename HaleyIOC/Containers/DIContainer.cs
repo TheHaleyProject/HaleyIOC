@@ -666,6 +666,13 @@ namespace Haley.IOC
         }
         #endregion
 
+        #region Service Provider Methods
+        public object GetService(Type serviceType)
+        {
+            return Resolve(serviceType);
+        }
+        #endregion
+
         #region TryResolve Methods
         public bool TryResolve(Type contract_type, out object concrete_instance, ResolveMode mode = ResolveMode.AsRegistered)
         {
@@ -765,7 +772,9 @@ namespace Haley.IOC
             //Change below method.
             return _mainResolve(_res_load,_map_load);
         }
+
        
+
         #endregion
         #endregion
 
