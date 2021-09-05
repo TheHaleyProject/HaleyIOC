@@ -9,7 +9,7 @@
     <Company>TheHaleyProject</Company>
     <Description>Simple IOC Container which implements Dependency Injection</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/rmsmech/HaleyIOC</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/TheHaleyProject/HaleyIOC</PackageProjectUrl>
 	  <IncludeSymbols>true</IncludeSymbols>
 	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	  <PackageIcon>Haley.png</PackageIcon>
