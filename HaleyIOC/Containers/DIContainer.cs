@@ -424,7 +424,7 @@ namespace Haley.IOC
                         continue; //Implement a logger to capture the details and return back to the user.
                     }
                 }
-                concrete_instance =  _instances_list.changeType(resolve_load.contract_type); //Convert to the contract type.
+                concrete_instance =  _instances_list.ChangeType(resolve_load.contract_type); //Convert to the contract type.
             }
         }
         #endregion
@@ -611,13 +611,13 @@ namespace Haley.IOC
         public T Resolve<T>(ResolveMode mode = ResolveMode.AsRegistered)
         {
             var _obj = Resolve(typeof(T), mode);
-            return (T)_obj.changeType<T>();
+            return (T)_obj.ChangeType<T>();
         }
 
         public T Resolve<T>(string priority_key, ResolveMode mode = ResolveMode.AsRegistered)
         {
             var _obj = Resolve(priority_key, typeof(T), mode);
-            return (T)_obj.changeType<T>();
+            return (T)_obj.ChangeType<T>();
         }
 
         public object Resolve(Type contract_type, ResolveMode mode = ResolveMode.AsRegistered)
@@ -637,7 +637,7 @@ namespace Haley.IOC
         public T Resolve<T>(IMappingProvider mapping_provider, ResolveMode mode = ResolveMode.AsRegistered,bool currentOnlyAsTransient = false)
         {
             var _obj = Resolve(typeof(T),mapping_provider, mode, currentOnlyAsTransient);
-            return (T)_obj.changeType<T>();
+            return (T)_obj.ChangeType<T>();
         }
 
         public object Resolve(Type contract_type, IMappingProvider mapping_provider, ResolveMode mode = ResolveMode.AsRegistered, bool currentOnlyAsTransient = false)
@@ -735,12 +735,12 @@ namespace Haley.IOC
         public T ResolveTransient<T>(TransientCreationLevel transient_level)
         {
             var _obj = ResolveTransient(typeof(T), transient_level);
-            return (T)_obj.changeType<T>();
+            return (T)_obj.ChangeType<T>();
         }
         public T ResolveTransient<T>(string priority_key,TransientCreationLevel transient_level)
         {
             var _obj = ResolveTransient(priority_key, typeof(T), transient_level);
-            return (T)_obj.changeType<T>();
+            return (T)_obj.ChangeType<T>();
         }
         public object ResolveTransient(Type contract_type, TransientCreationLevel transient_level)
         {
@@ -756,7 +756,7 @@ namespace Haley.IOC
         public T ResolveTransient<T>(IMappingProvider mapping_provider, MappingLevel mapping_level = MappingLevel.CurrentWithDependencies)
         {
             var _obj = ResolveTransient(typeof(T), mapping_provider, mapping_level);
-            return (T)_obj.changeType<T>();
+            return (T)_obj.ChangeType<T>();
         }
         public object ResolveTransient(Type contract_type, IMappingProvider mapping_provider, MappingLevel mapping_level = MappingLevel.CurrentWithDependencies)
         {
