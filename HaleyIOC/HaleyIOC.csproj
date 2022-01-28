@@ -13,7 +13,7 @@
 	  <IncludeSymbols>true</IncludeSymbols>
 	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	  <PackageIcon>Haley.png</PackageIcon>
-	  <PackageReleaseNotes>Changed logo</PackageReleaseNotes>
+	  <PackageReleaseNotes>Change camelcase to Pascal case. Updated references to latest Haley.Extensions library.</PackageReleaseNotes>
 	  <RepositoryUrl>https://github.com/rmsmech/HaleyIOC</RepositoryUrl>
 	  <RepositoryType>GIT</RepositoryType>
 	  <SignAssembly>true</SignAssembly>
@@ -21,7 +21,7 @@
 	  <AssemblyVersion>2.0.2.0</AssemblyVersion>
 	  <FileVersion>2.0.2.0</FileVersion>
 	  <PackageTags>IOC, DependencyInjection, DI</PackageTags>
-	  <Version>3.0.3</Version>
+	  <Version>3.0.4</Version>
   </PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DebugType>portable</DebugType>
@@ -44,7 +44,7 @@
     </When>
     <Otherwise>
      <ItemGroup>
-       <PackageReference Include="Haley.Extensions" Version="2.0.1" />
+       <PackageReference Include="Haley.Extensions" Version="2.1.0" />
 	 </ItemGroup>
     </Otherwise>
 </Choose>  
