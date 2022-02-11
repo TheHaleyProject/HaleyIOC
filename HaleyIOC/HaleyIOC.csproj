@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -21,7 +21,7 @@
 	  <AssemblyVersion>2.0.2.0</AssemblyVersion>
 	  <FileVersion>2.0.2.0</FileVersion>
 	  <PackageTags>IOC, DependencyInjection, DI</PackageTags>
-	  <Version>3.0.4</Version>
+	  <Version>3.0.5</Version>
   </PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DebugType>portable</DebugType>
@@ -33,7 +33,23 @@
 	    <PackagePath></PackagePath>
 	  </None>
 	</ItemGroup>
+
 	<Import Project="$(SolutionDir)ProjectReferences_$(SolutionName).txt" Condition="Exists('$(SolutionDir)ProjectReferences_$(SolutionName).txt')" />
+	<Choose>
+    <When Condition="Exists($(HaleyAbstractions))">
+      <ItemGroup>
+        <ProjectReference Include="$(HaleyAbstractions)\HaleyAbstractions.csproj">
+          <Name>HaleyAbstractions</Name>
+        </ProjectReference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+     <ItemGroup>
+		 <PackageReference Include="Haley.Abstractions" Version="1.0.0" />
+	 </ItemGroup>
+    </Otherwise>
+</Choose> 
+
 <Choose>
     <When Condition="Exists($(HaleyExtensions))">
       <ItemGroup>

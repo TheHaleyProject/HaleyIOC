@@ -14,7 +14,7 @@ namespace Haley.IOC
     public sealed class DIContainer : IBaseContainer
     {
         #region ATTRIBUTES
-        private readonly ConcurrentDictionary<KeyBase, RegisterLoad> _mappings = new ConcurrentDictionary<KeyBase, RegisterLoad>();
+        private readonly ConcurrentDictionary<IKeyBase, RegisterLoad> _mappings = new ConcurrentDictionary<IKeyBase, RegisterLoad>();
         #endregion
 
         #region Properties
@@ -434,7 +434,7 @@ namespace Haley.IOC
         #region PUBLIC METHODS
 
         #region Validations
-        public (bool status, Type registered_type, string message, RegisterMode mode) CheckIfRegistered(KeyBase key)
+        public (bool status, Type registered_type, string message, RegisterMode mode) CheckIfRegistered(IKeyBase key)
         {
             RegisterLoad _current_load = new RegisterLoad();
 

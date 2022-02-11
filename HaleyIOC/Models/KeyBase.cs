@@ -6,7 +6,7 @@ using Haley.Enums;
 
 namespace Haley.Models
 {
-    public class KeyBase : IEquatable<KeyBase>
+    public class KeyBase :IKeyBase, IEquatable<KeyBase>
     {
         public string id { get;  }
         public string priority { get;}
