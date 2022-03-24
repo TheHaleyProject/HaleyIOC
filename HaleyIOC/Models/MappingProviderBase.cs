@@ -111,7 +111,5 @@ namespace Haley.Models
             return _output_tuple;
         }
         #endregion
-
-
     }
 }

@@ -13,7 +13,7 @@
 	  <IncludeSymbols>true</IncludeSymbols>
 	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	  <PackageIcon>Haley.png</PackageIcon>
-	  <PackageReleaseNotes>Change camelcase to Pascal case. Updated references to latest Haley.Extensions library.</PackageReleaseNotes>
+	  <PackageReleaseNotes>Minor changes to current implementation. Added child container implementation. Changed the RegisterMode enum values.</PackageReleaseNotes>
 	  <RepositoryUrl>https://github.com/rmsmech/HaleyIOC</RepositoryUrl>
 	  <RepositoryType>GIT</RepositoryType>
 	  <SignAssembly>true</SignAssembly>
@@ -21,7 +21,7 @@
 	  <AssemblyVersion>2.0.2.0</AssemblyVersion>
 	  <FileVersion>2.0.2.0</FileVersion>
 	  <PackageTags>IOC, DependencyInjection, DI</PackageTags>
-	  <Version>3.0.6</Version>
+	  <Version>3.0.8</Version>
   </PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DebugType>portable</DebugType>
@@ -33,6 +33,9 @@
 	    <PackagePath></PackagePath>
 	  </None>
 	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Haley.Abstractions" Version="1.0.12" />
+	</ItemGroup>
 
 	<Import Project="$(SolutionDir)ProjectReferences_$(SolutionName).txt" Condition="Exists('$(SolutionDir)ProjectReferences_$(SolutionName).txt')" />
 	<Choose>
@@ -43,11 +46,7 @@
         </ProjectReference>
       </ItemGroup>
     </When>
-    <Otherwise>
-     <ItemGroup>
-		 <PackageReference Include="Haley.Abstractions" Version="1.0.3" />
-	 </ItemGroup>
-    </Otherwise>
+    <Otherwise />
 </Choose> 
 
 <Choose>
@@ -60,7 +59,7 @@
     </When>
     <Otherwise>
      <ItemGroup>
-       <PackageReference Include="Haley.Extensions" Version="2.1.4" />
+       <PackageReference Include="Haley.Extensions" Version="2.1.5" />
 	 </ItemGroup>
     </Otherwise>
 </Choose>  

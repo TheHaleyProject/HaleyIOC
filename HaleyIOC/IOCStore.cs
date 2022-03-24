@@ -11,7 +11,7 @@ namespace Haley.IOC
 
         public IOCStore()
         {
-            DI = new DIContainer() { };
+            DI = new MicroContainer() { };
         }
         public static IOCStore Singleton = new IOCStore();
     }
