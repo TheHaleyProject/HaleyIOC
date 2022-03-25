@@ -11,7 +11,7 @@ using Haley.Utils;
 
 namespace Haley.IOC
 {
-    public  sealed partial class MicroContainer : IBaseContainer
+    public  sealed partial class MicroContainer 
     {
         #region Resolve Methods
         public T Resolve<T>(ResolveMode mode = ResolveMode.AsRegistered)
@@ -172,5 +172,10 @@ namespace Haley.IOC
             return MainResolve(_res_load,_map_load);
         }
         #endregion
+
+        public object GetService(Type serviceType)
+        {
+            return Resolve(serviceType);
+        }
     }
 }

@@ -11,7 +11,7 @@ using Haley.Utils;
 
 namespace Haley.IOC
 {
-    public  sealed partial class MicroContainer : IBaseContainer
+    public  sealed partial class MicroContainer 
     {
         #region Register Methods
         public bool Register<TConcrete>(RegisterMode mode = RegisterMode.ContainerSingleton) where TConcrete : class

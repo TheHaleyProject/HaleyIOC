@@ -11,7 +11,7 @@ using Haley.Utils;
 
 namespace Haley.IOC
 {
-    public  sealed partial class MicroContainer : IBaseContainer
+    public  sealed partial class MicroContainer 
     {
         #region Creation Methods
         private bool register(RegisterLoad register_load, MappingLoad mapping_load)

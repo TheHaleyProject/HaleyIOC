@@ -11,7 +11,7 @@ using Haley.Utils;
 
 namespace Haley.IOC
 {
-    public  sealed partial class MicroContainer : IBaseContainer
+    public  sealed partial class MicroContainer 
     {
         #region Resolution Methods
         private object MainResolve(ResolveLoad resolve_load, MappingLoad mapping_load)
@@ -82,9 +82,9 @@ namespace Haley.IOC
             if (regData.exists)
             {
                 //If already exists, then fetch the concrete type. Also, if a concrete type is registered, we can be confident that it has already passed the concrete type validation.
-                resolve_load.ConcreteType = regData.load.ConcreteType ?? resolve_load.ConcreteType ?? current_contract_type;
+                resolve_load.ConcreteType = regData.load?.ConcreteType ?? resolve_load.ConcreteType ?? current_contract_type;
 
-                if (regData.isInParentContainer && (regData.load.Mode == RegisterMode.ContainerSingleton || regData.load.Mode == RegisterMode.ContainerWeakSingleton))
+                if (regData.isInParentContainer && (regData.load?.Mode == RegisterMode.ContainerSingleton || regData.load?.Mode == RegisterMode.ContainerWeakSingleton) && !StopCheckingParents)
                 {
                     //We found a registered data but not in current container but in some parent. So, we need to register this singleton object in this local container and return it.
                     var newSingletonInstance = createInstance(resolve_load, mapping_load);
@@ -129,6 +129,15 @@ namespace Haley.IOC
             _resolveArrayTypes(resolve_load, mapping_load, out concrete_instance);
             if (concrete_instance != null) return;
 
+            //By default, create instance for the contract type.
+            if (resolve_load.ConcreteType == null)
+            { resolve_load.ConcreteType = resolve_load.ContractType; }
+
+            //Try to resolve with mapping provider before anything. (if we have any kind of string parameter, we will resolve using mapping provider).
+            resolveWithMappingProvider(resolve_load, ref mapping_load, out concrete_instance);
+            if (concrete_instance != null) return;
+
+
             //This will try to resolve in current container and go one level up to each parent.
             var registeredData = getMapping(resolve_load.PriorityKey, resolve_load.ContractType);
 
@@ -138,17 +147,12 @@ namespace Haley.IOC
                 registeredData = getMapping(null, resolve_load.ContractType);
             }
 
-            //By default, create instance for the contract type.
-            if (resolve_load.ConcreteType == null)
-            { resolve_load.ConcreteType = resolve_load.ContractType; }
             //If a mapping already exists, then create instance for the concrete type in mapping.
-            if (registeredData.exists)
-            { resolve_load.ConcreteType = registeredData.load?.ConcreteType; }
+            if (registeredData.exists && !(registeredData.isInParentContainer && StopCheckingParents))
+            {
+                resolve_load.ConcreteType = registeredData.load?.ConcreteType; 
+            }
 
-            //Try to resolve with mapping provider before anything. (if we have any kind of string parameter, we will resolve using mapping provider).
-            resolveWithMappingProvider(resolve_load, ref mapping_load, out concrete_instance);
-
-            if (concrete_instance != null) return;
 
             //Validate concrete type.
             if (resolve_load.ConcreteType == typeof(string) || resolve_load.ConcreteType.IsValueType)
