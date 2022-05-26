@@ -40,7 +40,7 @@ namespace Haley.IOC
 
             //Before we try to do any kind of resolve, check for universal singelton instances. if found, return then. 
             //Universal singleton instances are only found in the root.
-            if (resolveUniversalObject(ref concrete_instance, resolve_load) && concrete_instance != null) return concrete_instance;
+            if (ResolveUniversalObject(ref concrete_instance, resolve_load) && concrete_instance != null) return concrete_instance;
 
             switch (resolve_load.Mode)
             {
@@ -106,7 +106,7 @@ namespace Haley.IOC
                 if (regData.isInParentContainer && (regData.load?.Mode == RegisterMode.ContainerSingleton || regData.load?.Mode == RegisterMode.ContainerWeakSingleton) && !StopCheckingParents)
                 {
                     //We found a registered data but not in current container but in some parent. So, we need to register this singleton object in this local container and return it.
-                    var newSingletonInstance = createInstance(resolve_load, mapping_load);
+                    var newSingletonInstance = CreateInstanceInternal(resolve_load, mapping_load);
                     if (newSingletonInstance != null)
                     {
                         //Use this singleton and register in this container.
@@ -132,7 +132,7 @@ namespace Haley.IOC
                         }
                         break;
                     case RegisterMode.Transient:
-                        concrete_instance = createInstance(resolve_load, mapping_load);
+                        concrete_instance = CreateInstanceInternal(resolve_load, mapping_load);
                         break;
                 }
             }
@@ -199,7 +199,7 @@ namespace Haley.IOC
                 }
 
                 if (concrete_instance != null) return; //Meaning we managed to fill the value through forced singleton.
-                concrete_instance = createInstance(resolve_load, mapping_load);
+                concrete_instance = CreateInstanceInternal(resolve_load, mapping_load);
             }
             else
             {
@@ -254,19 +254,34 @@ namespace Haley.IOC
 
         private object ResolveOnDemand(ref RegisterLoad load,ResolveLoad resolve_load = null,MappingLoad mapping_load = null)
         {
+            //First priority: Concrete instance.
             if (load.ConcreteInstance != null) return load.ConcreteInstance;
+
+            //Second priority: Check if any delegate is present.
+            if (load.InstanceCreator != null)
+            {
+                try
+                {
+                    load.ConcreteInstance = load.InstanceCreator.Invoke();
+                    if (load.ConcreteInstance != null) return load.ConcreteInstance;
+                }
+                catch (Exception)
+                {
+                    //log it.
+                }
+            }
 
             if (resolve_load == null)
             {
                 //Convert register load to resolve load.
                 resolve_load = load.Convert(null, null, ResolveMode.AsRegistered);
             }
-            load.ConcreteInstance = createInstance(resolve_load, mapping_load); //Create instance resolving all dependencies
+            load.ConcreteInstance = CreateInstanceInternal(resolve_load, mapping_load); //Create instance resolving all dependencies
             return load.ConcreteInstance;
 
         }
 
-        private bool resolveUniversalObject(ref object concrete_instance, ResolveLoad load)
+        private bool ResolveUniversalObject(ref object concrete_instance, ResolveLoad load)
         {
             //Try to see if the root has any object.
             if (!IsRoot && Root != null)

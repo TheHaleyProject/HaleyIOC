@@ -53,7 +53,7 @@ namespace Haley.IOC
             MappingLoad _map_load = new MappingLoad(mapping_provider, MappingLevel.CurrentWithDependencies);
             if (mode == ResolveMode.AsRegistered && currentOnlyAsTransient)
             {
-                return createInstance(_request, _map_load); //This ensures that the first level is created as transient, irrespective of the resolve mode.
+                return CreateInstanceInternal(_request, _map_load); //This ensures that the first level is created as transient, irrespective of the resolve mode.
             }
             return MainResolve(_request, _map_load);
         }
@@ -66,7 +66,7 @@ namespace Haley.IOC
 
             if (mode == ResolveMode.AsRegistered && currentOnlyAsTransient)
             {
-                return createInstance(_request, _map_load); //This ensures that the first level is created as transient, irrespective of the resolve mode.
+                return CreateInstanceInternal(_request, _map_load); //This ensures that the first level is created as transient, irrespective of the resolve mode.
             }
             return MainResolve(_request, _map_load);
         }
