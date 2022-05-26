@@ -19,6 +19,25 @@ namespace Haley.IOC
             //If failed to resolve with in this container, we move ahead and go to the parent.
             object concrete_instance = null;
 
+            //At most priority should be give to override
+            if (OverrideCallBack != null)
+            {
+                try
+                {
+                   concrete_instance = OverrideCallBack?.Invoke(resolve_load);
+                   if (concrete_instance?.GetType() != resolve_load.ConcreteType)
+                    {
+                        concrete_instance = null;
+                    }
+
+                   if (concrete_instance != null) return concrete_instance;
+                }
+                catch (Exception)
+                {
+                    //Later stage try to log it.
+                }
+            }
+
             //Before we try to do any kind of resolve, check for universal singelton instances. if found, return then. 
             //Universal singleton instances are only found in the root.
             if (resolveUniversalObject(ref concrete_instance, resolve_load) && concrete_instance != null) return concrete_instance;
@@ -107,6 +126,10 @@ namespace Haley.IOC
                     case RegisterMode.ContainerSingleton:
                     case RegisterMode.ContainerWeakSingleton:
                         concrete_instance = regData.load.ConcreteInstance;
+                        if (concrete_instance == null)
+                        {
+                            concrete_instance = ResolveOnDemand(ref regData.load, resolve_load, mapping_load);
+                        }
                         break;
                     case RegisterMode.Transient:
                         concrete_instance = createInstance(resolve_load, mapping_load);
@@ -169,6 +192,10 @@ namespace Haley.IOC
                 {
                     //Only for weak singleton (inside same container) we should allow transient creation or else reuse the registered data. If the singleton is coming from parent container, then we should allow creation of transient.
                     concrete_instance = registeredData.load.ConcreteInstance;
+                    if (concrete_instance == null)
+                    {
+                        concrete_instance = ResolveOnDemand(ref registeredData.load, resolve_load, mapping_load);
+                    }
                 }
 
                 if (concrete_instance != null) return; //Meaning we managed to fill the value through forced singleton.
@@ -225,6 +252,20 @@ namespace Haley.IOC
             }
         }
 
+        private object ResolveOnDemand(ref RegisterLoad load,ResolveLoad resolve_load = null,MappingLoad mapping_load = null)
+        {
+            if (load.ConcreteInstance != null) return load.ConcreteInstance;
+
+            if (resolve_load == null)
+            {
+                //Convert register load to resolve load.
+                resolve_load = load.Convert(null, null, ResolveMode.AsRegistered);
+            }
+            load.ConcreteInstance = createInstance(resolve_load, mapping_load); //Create instance resolving all dependencies
+            return load.ConcreteInstance;
+
+        }
+
         private bool resolveUniversalObject(ref object concrete_instance, ResolveLoad load)
         {
             //Try to see if the root has any object.
@@ -235,6 +276,11 @@ namespace Haley.IOC
                 {
                     mCont.Mappings.TryGetValue(new KeyBase(load.ContractType, load.PriorityKey), out var result);
                     concrete_instance = result.ConcreteInstance; //Return the universal object directly.
+                    if (concrete_instance == null)
+                    {
+                        concrete_instance = ResolveOnDemand(ref result,load);
+                    }
+
                     return true;
                 }
             }

@@ -21,12 +21,15 @@ namespace Haley.IOC
         IBaseContainer Parent;
         IBaseContainer Root;
         internal bool IsRoot = false; //Whenever the container is created using the "CreateChildContainerMode" it should not be a root.
+        Func<ResolveLoad, object> OverrideCallBack = null;
+
         #endregion
 
         public event EventHandler<IBaseContainer> ChildCreated;
         public event EventHandler<string> ContainerDisposed;
 
         #region Properties
+        public bool OnDemandResolution { get; private set; }
         public bool IsDisposed { get; private set; }
         public bool StopCheckingParents { get; private set; }
         public string Id { get;}
@@ -72,6 +75,7 @@ namespace Haley.IOC
 
         public MicroContainer() 
         {
+            OnDemandResolution = false;
             Id = Guid.NewGuid().ToString();
             ErrorHandling = ExceptionHandling.Throw;
             IsRoot = true; //Whenever we create a new microcontainer, that becomes a root. However, if created using "CreateChildContainer" method, that becomes a child.
@@ -226,6 +230,19 @@ namespace Haley.IOC
         #endregion
 
         #region Validataions
+        public bool TrySetResolutionOverride(Func<ResolveLoad, object> overrideCallback)
+        {
+            if (OverrideCallBack != null) return false;
+            OverrideCallBack = overrideCallback;
+            return true;
+        }
+        public void SetOnDemandResolution(bool flag)
+        {
+            //This will only affect during the registration time.
+            //If we have already have some registrations done (but without resolution), those will still be resolved on demand.
+            OnDemandResolution = flag;
+        }
+
         public (bool status, string message, IRegisterLoad load) CheckIfRegistered(IKeyBase key, bool checkInParents = false)
         {
             //Check if it is registered as an UniversalSingleton Object at the root level.

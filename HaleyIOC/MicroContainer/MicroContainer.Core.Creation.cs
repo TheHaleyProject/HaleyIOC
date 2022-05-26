@@ -24,17 +24,17 @@ namespace Haley.IOC
 
             //Validate if the contract type is alredy registered. If so, against correct concrete type.
             //if a priority key - contract type combo is already registered as an Universal Singleton, that also will be returned in below method.
-            //We donot check if the parents have already some registered value because in such cases, we are OVERRIDDING THE VALUES at this container level. So, only while resolving we need to validate.
+            //We donot check if the parents have already some registered value because in such cases, we are OVERRIDDING THE VALUES at this container level. So, only while resolving we need to validate. Thus, in below method, we will use "CheckinParents = false".
             if (ExistsInCurrentContainer(register_load)) return false; 
 
             //Validate if the concrete type can be registered
             validateConcreteType(register_load.ConcreteType);
 
             //Generate instance only if the provided value is null and also singleton. Only if it is singleton, we create an instance and store. Else we store only the concrete type and save instance as it is (even if is null).
-            if (register_load.ConcreteInstance == null && register_load.Mode != RegisterMode.Transient)
+            if (register_load.ConcreteInstance == null && register_load.Mode != RegisterMode.Transient && !OnDemandResolution)
             {
-                ResolveLoad resolve_load = register_load.Convert(null, null, ResolveMode.AsRegistered);
-                register_load.ConcreteInstance = createInstance(resolve_load, mapping_load); //Create instance resolving all dependencies
+                //If we have opted for on demand resolution, we should only register the interfaces and types and do not try to create an instance now.
+                ResolveOnDemand(ref register_load, null, mapping_load);
             }
 
             //Get the key to register.
