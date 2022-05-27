@@ -21,7 +21,7 @@ namespace Haley.IOC
         IBaseContainer Parent;
         IBaseContainer Root;
         internal bool IsRoot = false; //Whenever the container is created using the "CreateChildContainerMode" it should not be a root.
-        Func<ResolveLoad, object> OverrideCallBack = null;
+        Func<ResolveLoad,string, object> OverrideCallBack = null;
 
         #endregion
 
@@ -29,7 +29,7 @@ namespace Haley.IOC
         public event EventHandler<string> ContainerDisposed;
 
         #region Properties
-        public bool OnDemandResolution { get; private set; }
+        public bool ResolveOnlyOnDemand { get; private set; }
         public bool IsDisposed { get; private set; }
         public bool StopCheckingParents { get; private set; }
         public string Id { get;}
@@ -38,6 +38,18 @@ namespace Haley.IOC
         #endregion
 
         #region Child Handling
+        /// <summary>
+        /// Gets the top level child container
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IBaseContainer GetChildContainer(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id) || ChildContainers == null || ChildContainers?.Count == 0) return null;
+            ChildContainers.TryGetValue(id,out var container);
+            return container;
+        }
+
         public IBaseContainer CreateChildContainer(string name = null, bool stopCheckingParents = false)
         {
             
@@ -75,7 +87,7 @@ namespace Haley.IOC
 
         public MicroContainer() 
         {
-            OnDemandResolution = false;
+            ResolveOnlyOnDemand = false;
             Id = Guid.NewGuid().ToString();
             ErrorHandling = ExceptionHandling.Throw;
             IsRoot = true; //Whenever we create a new microcontainer, that becomes a root. However, if created using "CreateChildContainer" method, that becomes a child.
@@ -230,17 +242,17 @@ namespace Haley.IOC
         #endregion
 
         #region Validataions
-        public bool TrySetResolutionOverride(Func<ResolveLoad, object> overrideCallback)
+        public bool TrySetResolutionOverride(Func<ResolveLoad, string, object> overrideCallback)
         {
             if (OverrideCallBack != null) return false;
             OverrideCallBack = overrideCallback;
             return true;
         }
-        public void SetOnDemandResolution(bool flag)
+        public void SetResolveOnlyOnDemandMode(bool flag)
         {
             //This will only affect during the registration time.
             //If we have already have some registrations done (but without resolution), those will still be resolved on demand.
-            OnDemandResolution = flag;
+            ResolveOnlyOnDemand = flag;
         }
 
         public (bool status, string message, IRegisterLoad load) CheckIfRegistered(IKeyBase key, bool checkInParents = false)

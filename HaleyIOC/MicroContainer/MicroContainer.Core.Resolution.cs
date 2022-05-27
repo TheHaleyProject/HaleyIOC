@@ -24,7 +24,7 @@ namespace Haley.IOC
             {
                 try
                 {
-                   concrete_instance = OverrideCallBack?.Invoke(resolve_load);
+                   concrete_instance = OverrideCallBack?.Invoke(resolve_load,this.Id); //Send in the container id for referencing by the override call back
                    if (concrete_instance?.GetType() != resolve_load.ConcreteType)
                     {
                         concrete_instance = null;
