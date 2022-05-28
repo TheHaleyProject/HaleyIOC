@@ -30,7 +30,7 @@ namespace Haley.IOC
                 if (ExistsInCurrentContainer(register_load)) return false;
 
                 //Validate if the concrete type can be registered
-                validateConcreteType(register_load.ConcreteType);
+                if (!ValidateConcreteType(register_load.ConcreteType)) return false ;
 
                 //Generate instance only if the provided value is null and also singleton. Only if it is singleton, we create an instance and store. Else we store only the concrete type and save instance as it is (even if is null).
                 if (register_load.ConcreteInstance == null && register_load.Mode != RegisterMode.Transient && !ResolveOnlyOnDemand)
@@ -57,7 +57,7 @@ namespace Haley.IOC
             //If transient creation is current level only, then further dependencies should not generate new instance.
             if (resolve_load.TransientLevel == TransientCreationLevel.Current) resolve_load.TransientLevel = TransientCreationLevel.None;
             object concrete_instance = null;
-            validateConcreteType(resolve_load.ConcreteType);
+            if (!ValidateConcreteType(resolve_load.ConcreteType)) return null;
 
             //PRIO 1 - Try to see if this is a kind of universal dependency.
             if(ResolveUniversalObject(ref concrete_instance, resolve_load) && concrete_instance != null) return concrete_instance;

@@ -45,16 +45,16 @@ namespace Haley.IOC
             switch (resolve_load.Mode)
             {
                 case ResolveMode.AsRegistered: //This can be transient or singleton.
-                    resolveAsRegistered(resolve_load, mapping_load, out concrete_instance);
+                    ResolveAsRegistered(resolve_load, mapping_load, out concrete_instance);
                     break;
                 case ResolveMode.Transient: //This creates new instance.
-                    resolveAsTransient(resolve_load, mapping_load, out concrete_instance);
+                    ResolveAsTransient(resolve_load, mapping_load, out concrete_instance);
                     break;
             }
 
             return concrete_instance;
         }
-        private void resolveWithMappingProvider(ResolveLoad resolve_load, ref MappingLoad mapping_load, out object concrete_instance)
+        private void ResolveWithMappingProvider(ResolveLoad resolve_load, ref MappingLoad mapping_load, out object concrete_instance)
         {
             //Begin with null output.
             concrete_instance = null;
@@ -75,7 +75,7 @@ namespace Haley.IOC
                 concrete_instance = _dip_values.concrete_instance;
             }
         }
-        private void resolveAsRegistered(ResolveLoad resolve_load, MappingLoad mapping_load, out object concrete_instance)
+        private void ResolveAsRegistered(ResolveLoad resolve_load, MappingLoad mapping_load, out object concrete_instance)
         {
             concrete_instance = null;
             Type current_contract_type = resolve_load.ContractType;
@@ -93,7 +93,7 @@ namespace Haley.IOC
             }
             
             //Try to resolve with mapping provider before anything.
-            resolveWithMappingProvider(resolve_load, ref mapping_load, out concrete_instance);
+            ResolveWithMappingProvider(resolve_load, ref mapping_load, out concrete_instance);
 
             if (concrete_instance != null) return;
 
@@ -145,7 +145,7 @@ namespace Haley.IOC
                 concrete_instance = MainResolve(resolve_load, mapping_load);
             }
         }
-        private void resolveAsTransient(ResolveLoad resolve_load, MappingLoad mapping_load, out object concrete_instance)
+        private void ResolveAsTransient(ResolveLoad resolve_load, MappingLoad mapping_load, out object concrete_instance)
         {
             concrete_instance = null;
             //Try to resolve multiple params if needed.
@@ -157,7 +157,7 @@ namespace Haley.IOC
             { resolve_load.ConcreteType = resolve_load.ContractType; }
 
             //Try to resolve with mapping provider before anything. (if we have any kind of string parameter, we will resolve using mapping provider).
-            resolveWithMappingProvider(resolve_load, ref mapping_load, out concrete_instance);
+            ResolveWithMappingProvider(resolve_load, ref mapping_load, out concrete_instance);
             if (concrete_instance != null) return;
 
 

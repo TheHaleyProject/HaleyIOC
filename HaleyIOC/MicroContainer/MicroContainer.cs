@@ -123,12 +123,17 @@ namespace Haley.IOC
             var _status = CheckIfRegistered(register_load.ContractType, register_load.PriorityKey);
             return _status.status; //Returns if registered.
         }
-        private void validateConcreteType(Type concrete_type)
+        private bool ValidateConcreteType(Type concrete_type)
         {
             if (concrete_type == null || concrete_type.IsAbstract || concrete_type.IsEnum || concrete_type.IsInterface || concrete_type.IsArray || concrete_type.IsList() || concrete_type.IsEnumerable() || concrete_type.IsDictionary() || concrete_type.IsCollection())
             {
-                throw new ArgumentException($@"Concrete type cannot be null, abstract, enum, interface, array, list, enumerable, dictionary, or collection. {concrete_type} is not a valid concrete type.");
+                if (ErrorHandling == ExceptionHandling.Throw)
+                {
+                    throw new ArgumentException($@"Concrete type cannot be null, abstract, enum, interface, array, list, enumerable, dictionary, or collection. {concrete_type} is not a valid concrete type.");
+                }
+                return false;
             }
+            return true;
         }
 
         private RegisterMode convertMode(SingletonMode mode)
