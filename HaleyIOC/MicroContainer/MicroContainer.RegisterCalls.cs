@@ -21,7 +21,7 @@ namespace Haley.IOC
         }
         public bool DelegateRegister<TContract, TConcrete>(Func<TConcrete> del, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class, TContract
         {
-            return DelegateRegister(null, del, mode);
+            return DelegateRegister<TContract,TConcrete>(null, del, mode);
         }
         public bool DelegateRegister<TConcrete>(string priority_key, Func<TConcrete> del, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class
         {
