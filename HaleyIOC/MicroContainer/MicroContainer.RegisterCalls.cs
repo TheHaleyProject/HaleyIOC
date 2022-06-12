@@ -118,5 +118,14 @@ namespace Haley.IOC
             return RegisterInternal(_reg_load,_map_load);
         }
         #endregion
+
+        public bool RegisterLoad(RegisterLoad load)
+        {
+            //Load should contain certain basic values. ensure that
+            if (load == null) return false;
+            if (load.ContractType == null || load.ConcreteType == null ) return false;
+            //key, instance, instancedelegate can be null. No worries over there.
+            return RegisterInternal(load , new MappingLoad());
+        }
     }
 }

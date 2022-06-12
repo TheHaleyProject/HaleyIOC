@@ -118,7 +118,7 @@ namespace Haley.IOC
             }
             return _transient_level;
         }
-        private bool ExistsInCurrentContainer(RegisterLoad register_load)
+        private bool ExistsInCurrentContainer(IRegisterLoad register_load)
         {
             var _status = CheckIfRegistered(register_load.ContractType, register_load.PriorityKey);
             return _status.status; //Returns if registered.
