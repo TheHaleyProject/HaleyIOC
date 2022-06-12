@@ -24,13 +24,17 @@ namespace Haley.IOC
             {
                 try
                 {
-                   concrete_instance = OverrideCallBack?.Invoke(resolve_load,this.Id); //Send in the container id for referencing by the override call back
-                   if (concrete_instance?.GetType() != resolve_load.ConcreteType)
-                    {
-                        concrete_instance = null;
-                    }
-
-                   if (concrete_instance != null) return concrete_instance;
+                    do {
+                        concrete_instance = OverrideCallBack?.Invoke(resolve_load, this.Id); //Send in the container id for referencing by the override call back
+                        if (concrete_instance == null) break;
+                        //Now the concrete instance should either be same as contract type or should be assignable to contract type.
+                        var createdInstanceType = concrete_instance.GetType();
+                        if (createdInstanceType != resolve_load.ContractType && !resolve_load.ContractType.IsAssignableFrom(createdInstanceType)) {
+                            concrete_instance = null;
+                            break;
+                        }
+                        return concrete_instance;
+                    } while (false); //Execute only once.
                 }
                 catch (Exception)
                 {
@@ -287,7 +291,7 @@ namespace Haley.IOC
             if (!IsRoot && Root != null)
             {
                 var status = Root.CheckIfRegistered(load.ContractType, load.PriorityKey);
-                if (status.status && status.load.Mode == RegisterMode.UniversalSingleton && Root is MicroContainer mCont)
+                if (status.status && status.load?.Mode == RegisterMode.UniversalSingleton && Root is MicroContainer mCont)
                 {
                     mCont.Mappings.TryGetValue(new KeyBase(load.ContractType, load.PriorityKey), out var result);
                     concrete_instance = result.ConcreteInstance; //Return the universal object directly.
