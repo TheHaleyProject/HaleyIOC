@@ -33,10 +33,12 @@ namespace Haley.IOC
                 if (!ValidateConcreteType(register_load.ConcreteType)) return false ;
 
                 //Generate instance only if the provided value is null and also singleton. Only if it is singleton, we create an instance and store. Else we store only the concrete type and save instance as it is (even if is null).
-                if (register_load.ConcreteInstance == null && register_load.Mode != RegisterMode.Transient && !ResolveOnlyOnDemand)
-                {
-                    //If we have opted for on demand resolution, we should only register the interfaces and types and do not try to create an instance now.
-                    ResolveOnDemand(ref register_load, null, mapping_load);
+                if (!ResolveOnlyOnDemand && !register_load.IsLazyRegister) {
+                    //If we have opted for on demand resolution for the container (as a whole) or the registration itself is a lazy registration, we should not continue further. Because below step will try to create an instance.
+                    if (register_load.ConcreteInstance == null && register_load.Mode != RegisterMode.Transient) {
+                       //Also for transient resolutions, we dont' need to create the component now. We can wait until later.
+                        ResolveOnDemand(ref register_load, null, mapping_load);
+                    }
                 }
 
                 //Get the key to register.

@@ -261,8 +261,8 @@ namespace Haley.IOC
             //First priority: Concrete instance.
             if (load.ConcreteInstance != null) return load.ConcreteInstance;
 
-            //Second priority: Check if any delegate is present.
-            if (load.InstanceCreator != null)
+            //Second priority: Check if any delegate is present or this is marked as a lazy register.
+            if (load.InstanceCreator != null || load.IsLazyRegister)
             {
                 try
                 {

@@ -14,16 +14,16 @@ namespace Haley.IOC
     public  sealed partial class MicroContainer 
     {
 
-        #region DelegateRegister 
-        public bool DelegateRegister<TConcrete>(Func<TConcrete> del, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class
+        #region LazyRegister 
+        public bool LazyRegister<TConcrete>(Func<TConcrete> del=null, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class
         {
-            return DelegateRegister(null, del, mode);
+            return LazyRegisterWithKey(null, del, mode);
         }
-        public bool DelegateRegister<TContract, TConcrete>(Func<TConcrete> del, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class, TContract
+        public bool LazyRegister<TContract, TConcrete>(Func<TConcrete> del =null, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class, TContract
         {
-            return DelegateRegister<TContract,TConcrete>(null, del, mode);
+            return LazyRegisterWithKey<TContract,TConcrete>(null, del, mode);
         }
-        public bool DelegateRegister<TConcrete>(string priority_key, Func<TConcrete> del, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class
+        public bool LazyRegisterWithKey<TConcrete>(string priority_key, Func<TConcrete> del =null, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class
         {
             RegisterMode _regMode = convertMode(mode);
             RegisterLoad _reg_load = new RegisterLoad(_regMode, priority_key, typeof(TConcrete), typeof(TConcrete), null);
@@ -32,7 +32,7 @@ namespace Haley.IOC
             MappingLoad _map_load = new MappingLoad();
             return RegisterInternal(_reg_load, _map_load);
         }
-        public bool DelegateRegister<TContract, TConcrete>(string priority_key, Func<TConcrete> del, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class, TContract
+        public bool LazyRegisterWithKey<TContract, TConcrete>(string priority_key, Func<TConcrete> del =null, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class, TContract
         {
             RegisterMode _regMode = convertMode(mode);
             RegisterLoad _reg_load = new RegisterLoad(_regMode, priority_key, typeof(TContract), typeof(TConcrete), null);
