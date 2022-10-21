@@ -8,96 +8,71 @@ using System.Runtime.InteropServices;
 using Haley.Models;
 using Haley.Abstractions;
 using Haley.Utils;
+using System.Xml.Linq;
 
 namespace Haley.IOC
 {
-    public sealed partial class MicroContainer : IBaseContainer
+    public sealed partial class MicroContainer : IMicroContainer
     {
         #region ATTRIBUTES
         //All mappings for this container
         readonly ConcurrentDictionary<IKeyBase, RegisterLoad> Mappings = new ConcurrentDictionary<IKeyBase, RegisterLoad>();
         //created children
-        readonly ConcurrentDictionary<string, IBaseContainer> ChildContainers = new ConcurrentDictionary<string, IBaseContainer>();
-        IBaseContainer Parent;
-        IBaseContainer Root;
-        internal bool IsRoot = false; //Whenever the container is created using the "CreateChildContainerMode" it should not be a root.
         Func<ResolveLoad,string, object> OverrideCallBack = null;
 
         #endregion
-
-        public event EventHandler<IBaseContainer> ChildCreated;
         public event EventHandler<string> ContainerDisposed;
-
         #region Properties
         public bool ResolveOnlyOnDemand { get; private set; }
         public bool IsDisposed { get; private set; }
-        public bool StopCheckingParents { get; private set; }
         public string Id { get;}
         public string Name { get; }
         public ExceptionHandling ErrorHandling { get; set; }
         #endregion
 
-        #region Child Handling
-        /// <summary>
-        /// Gets the top level child container
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public IBaseContainer GetChildContainer(string id)
-        {
-            if (string.IsNullOrWhiteSpace(id) || ChildContainers == null || ChildContainers?.Count == 0) return null;
-            ChildContainers.TryGetValue(id,out var container);
-            return container;
-        }
+        public void Dispose() {
+            try {
+                if (IsDisposed) return;//Its already disposed.
 
-        public IBaseContainer CreateChildContainer(string name = null, bool stopCheckingParents = false)
-        {
-            
-            var newContainer = new MicroContainer(name) { Parent = this, IsRoot = false };
+                //Cascade dispose through all child.
+                foreach (var kvp in ChildContainers) {
+                    kvp.Value.Dispose();
+                }
 
-            newContainer.Root = IsRoot? this:Root;//If you are creating this from inside a root container, then "this" is the root for the child else this container's root is also the root for the child.
-            //Also add this to the child container dictionary
-            newContainer.StopCheckingParents = stopCheckingParents;
+                //Parent and root remains the same.
+                ChildContainers.Clear(); //All child container registrations will also be cleared.
+                Mappings.Clear();
+                
 
-            if (!ChildContainers.TryAdd(newContainer.Id, newContainer))
-            {
-                //unable to create a child container.
-                System.Diagnostics.Debug.WriteLine("Unable to create a child container");
-                return null;
+            } finally {
+                if (!IsDisposed) {
+                    IsDisposed = true;
+                    ContainerDisposed?.Invoke(this, Id); //subscribed items (like factory) will then dispose themselves.
+                }
             }
-            ChildCreated?.Invoke(this, newContainer); //So, if there are any other actions to be done by others, can happen based on this event.
-            return newContainer;
         }
-        public void Dispose()
-        {
-            //Cascade dispose through all child.
-            foreach (var kvp in ChildContainers)
-            {
-                kvp.Value.Dispose();
-            }
-
-            //Parent and root remains the same.
-            ChildContainers.Clear(); //All child container registrations will also be cleared.
-            Mappings.Clear();
-            IsDisposed = true;
-            ContainerDisposed?.Invoke(this, Id);
-        }
-
-        #endregion
 
         public MicroContainer() 
         {
             ResolveOnlyOnDemand = false;
-            Id = Guid.NewGuid().ToString();
+
+            if (string.IsNullOrWhiteSpace(Id)) {
+                Id = Guid.NewGuid().ToString();
+            }
+
             ErrorHandling = ExceptionHandling.Throw;
             IsRoot = true; //Whenever we create a new microcontainer, that becomes a root. However, if created using "CreateChildContainer" method, that becomes a child.
             //Within the scope of this container , whomever tries to resolve, will get only this container.
-            this.Register<IBaseContainer, MicroContainer>(this, SingletonMode.ContainerSingleton); //IHaleyContainer should not be an Universal Singleton as each scope will have their own container. 
+            this.Register<IMicroContainer, MicroContainer>(this, SingletonMode.ContainerSingleton); //IHaleyContainer should not be an Universal Singleton as each scope will have their own container. 
         }
         [HaleyIgnore]
-        public MicroContainer(string name) : this()
+        public MicroContainer(Guid id, string name) : this()
         {
             this.Name = name;
+            if (id == default(Guid)) {
+                id = Guid.NewGuid();
+            }
+            this.Id = Id.ToString();
         }
 
         #region Helpers
@@ -200,7 +175,7 @@ namespace Haley.IOC
 
             //If we are not able to find in current state, we go to the parent
 
-            if (Parent != null && Parent is MicroContainer mCont && !StopCheckingParents)
+            if (Parent != null && Parent is MicroContainer mCont && !IgnoreParentContainer)
             {
                 var parentResult = mCont.getMapping(key);
                 if (parentResult.exists)
@@ -297,7 +272,6 @@ namespace Haley.IOC
         {
             return CheckIfRegistered(typeof(Tcontract), priority_key, checkInParents);
         }
-
-        #endregion 
+        #endregion
     }
 }

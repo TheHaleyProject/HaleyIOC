@@ -107,7 +107,7 @@ namespace Haley.IOC
                 //If already exists, then fetch the concrete type. Also, if a concrete type is registered, we can be confident that it has already passed the concrete type validation.
                 resolve_load.ConcreteType = regData.load?.ConcreteType ?? resolve_load.ConcreteType ?? current_contract_type;
 
-                if (regData.isInParentContainer && (regData.load?.Mode == RegisterMode.ContainerSingleton || regData.load?.Mode == RegisterMode.ContainerWeakSingleton) && !StopCheckingParents)
+                if (regData.isInParentContainer && (regData.load?.Mode == RegisterMode.ContainerSingleton || regData.load?.Mode == RegisterMode.ContainerWeakSingleton) && !IgnoreParentContainer)
                 {
                     //We found a registered data but not in current container but in some parent. So, we need to register this singleton object in this local container and return it.
                     var newSingletonInstance = CreateInstanceInternal(resolve_load, mapping_load);
@@ -175,7 +175,7 @@ namespace Haley.IOC
             }
 
             //If a mapping already exists, then create instance for the concrete type in mapping.
-            if (registeredData.exists && !(registeredData.isInParentContainer && StopCheckingParents))
+            if (registeredData.exists && !(registeredData.isInParentContainer && IgnoreParentContainer))
             {
                 resolve_load.ConcreteType = registeredData.load?.ConcreteType; 
             }
