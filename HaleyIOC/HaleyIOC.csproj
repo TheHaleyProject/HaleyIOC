@@ -21,7 +21,7 @@
 	  <AssemblyVersion>2.0.2.0</AssemblyVersion>
 	  <FileVersion>2.0.2.0</FileVersion>
 	  <PackageTags>IOC, DependencyInjection, DI</PackageTags>
-	  <Version>3.0.13</Version>
+	  <Version>3.0.14</Version>
   </PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DebugType>portable</DebugType>
@@ -60,7 +60,7 @@
     </When>
     <Otherwise>
      <ItemGroup>
-       <PackageReference Include="Haley.Extensions" Version="2.1.15" />
+       <PackageReference Include="Haley.Extensions" Version="2.1.17" />
 	 </ItemGroup>
     </Otherwise>
 </Choose>  
