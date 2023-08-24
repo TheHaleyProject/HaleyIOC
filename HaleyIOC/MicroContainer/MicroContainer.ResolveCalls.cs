@@ -28,10 +28,7 @@ namespace Haley.IOC
 
         public object Resolve(Type contract_type, ResolveMode mode = ResolveMode.AsRegistered)
         {
-            TransientCreationLevel _tlevel = TransientCreationLevel.None;
-            if (mode == ResolveMode.Transient) _tlevel = TransientCreationLevel.Current;
-            ResolveLoad _request = new ResolveLoad(mode, null, null, contract_type, null, null,transient_level: _tlevel);
-            return MainResolve(_request,new MappingLoad());
+            return Resolve(null,contract_type, mode);
         }
         public object Resolve(string priority_key, Type contract_type, ResolveMode mode = ResolveMode.AsRegistered)
         {
@@ -48,14 +45,7 @@ namespace Haley.IOC
 
         public object Resolve(Type contract_type, IMappingProvider mapping_provider, ResolveMode mode = ResolveMode.AsRegistered, bool currentOnlyAsTransient = false)
         {
-            TransientCreationLevel _tlevel = TransientCreationLevel.Current;
-            ResolveLoad _request = new ResolveLoad(mode, null, null, contract_type, null, contract_type, transient_level: _tlevel);
-            MappingLoad _map_load = new MappingLoad(mapping_provider, MappingLevel.CurrentWithDependencies);
-            if (mode == ResolveMode.AsRegistered && currentOnlyAsTransient)
-            {
-                return CreateInstanceInternal(_request, _map_load); //This ensures that the first level is created as transient, irrespective of the resolve mode.
-            }
-            return MainResolve(_request, _map_load);
+            return Resolve(null, contract_type, mapping_provider, mode, currentOnlyAsTransient);
         }
 
         public object Resolve(string priority_key, Type contract_type, IMappingProvider mapping_provider, ResolveMode mode = ResolveMode.AsRegistered, bool currentOnlyAsTransient = false)
@@ -75,16 +65,7 @@ namespace Haley.IOC
         #region TryResolve Methods
         public bool TryResolve(Type contract_type, out object concrete_instance, ResolveMode mode = ResolveMode.AsRegistered)
         {
-            try
-            {
-                concrete_instance = Resolve(contract_type, mode);
-                return true;
-            }
-            catch (Exception)
-            {
-                concrete_instance = null;
-                return false;
-            }
+            return TryResolve(null, contract_type, out concrete_instance, mode);
         }
         public bool TryResolve(string priority_key, Type contract_type, out object concrete_instance, ResolveMode mode = ResolveMode.AsRegistered)
         {
@@ -102,16 +83,7 @@ namespace Haley.IOC
 
         public bool TryResolve(Type contract_type, IMappingProvider mapping_provider, out object concrete_instance, ResolveMode mode = ResolveMode.AsRegistered, bool currentOnlyAsTransient = false)
         {
-            try
-            {
-                concrete_instance = Resolve(contract_type,mapping_provider, mode, currentOnlyAsTransient);
-                return true;
-            }
-            catch (Exception)
-            {
-                concrete_instance = null;
-                return false;
-            }
+           return TryResolve(null,contract_type,mapping_provider, out concrete_instance,mode,currentOnlyAsTransient);
         }
 
         public bool TryResolve(string priority_key, Type contract_type, IMappingProvider mapping_provider, out object concrete_instance, ResolveMode mode = ResolveMode.AsRegistered, bool currentOnlyAsTransient = false)
@@ -143,8 +115,7 @@ namespace Haley.IOC
         }
         public object ResolveTransient(Type contract_type, TransientCreationLevel transient_level)
         {
-            ResolveLoad _res_load = new ResolveLoad(ResolveMode.Transient, null, null, contract_type, null, null, transient_level);
-            return MainResolve(_res_load,new MappingLoad());
+            return ResolveTransient(null,contract_type,transient_level);
         }
         public object ResolveTransient(string priority_key, Type contract_type, TransientCreationLevel transient_level)
         {
@@ -159,10 +130,7 @@ namespace Haley.IOC
         }
         public object ResolveTransient(Type contract_type, IMappingProvider mapping_provider, MappingLevel mapping_level = MappingLevel.CurrentWithDependencies)
         {
-            ResolveLoad _res_load = new ResolveLoad(ResolveMode.Transient, null, null, contract_type, null, null, _convertToTransientLevel(mapping_level));
-            MappingLoad _map_load = new MappingLoad(mapping_provider, mapping_level);
-            //Change below method.
-            return MainResolve(_res_load,_map_load);
+            return ResolveTransient(null,contract_type,mapping_provider,mapping_level);
         }
         public object ResolveTransient(string priority_key, Type contract_type, IMappingProvider mapping_provider, MappingLevel mapping_level = MappingLevel.CurrentWithDependencies)
         {

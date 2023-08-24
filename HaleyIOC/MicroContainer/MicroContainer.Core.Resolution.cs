@@ -93,6 +93,7 @@ namespace Haley.IOC
             if (!regData.exists)
             {
                 //Which means that the priority key could be absent. Try to get without priority key.
+                //todo: What if we deliberately expect to work with priority key? then in that case, we should not even fetch other values. Check..
                 regData = getMapping(null, current_contract_type);
             }
             
