@@ -48,10 +48,10 @@ namespace Haley.IOC
 
             switch (resolve_load.Mode)
             {
-                case ResolveMode.AsRegistered: //This can be transient or singleton.
+                case IOCResolveMode.AsRegistered: //This can be transient or singleton.
                     ResolveAsRegistered(resolve_load, mapping_load, out concrete_instance);
                     break;
-                case ResolveMode.Transient: //This creates new instance.
+                case IOCResolveMode.Transient: //This creates new instance.
                     ResolveAsTransient(resolve_load, mapping_load, out concrete_instance);
                     break;
             }
@@ -108,7 +108,7 @@ namespace Haley.IOC
                 //If already exists, then fetch the concrete type. Also, if a concrete type is registered, we can be confident that it has already passed the concrete type validation.
                 resolve_load.ConcreteType = regData.load?.ConcreteType ?? resolve_load.ConcreteType ?? current_contract_type;
 
-                if (regData.isInParentContainer && (regData.load?.Mode == RegisterMode.ContainerSingleton || regData.load?.Mode == RegisterMode.ContainerWeakSingleton) && !IgnoreParentContainer)
+                if (regData.isInParentContainer && (regData.load?.Mode == IOCRegisterMode.ContainerSingleton || regData.load?.Mode == IOCRegisterMode.ContainerWeakSingleton) && !IgnoreParentContainer)
                 {
                     //We found a registered data but not in current container but in some parent. So, we need to register this singleton object in this local container and return it.
                     var newSingletonInstance = CreateInstanceInternal(resolve_load, mapping_load);
@@ -127,23 +127,23 @@ namespace Haley.IOC
 
                 switch (regData.load.Mode)
                 {
-                    case RegisterMode.UniversalSingleton:
-                    case RegisterMode.ContainerSingleton:
-                    case RegisterMode.ContainerWeakSingleton:
+                    case IOCRegisterMode.UniversalSingleton:
+                    case IOCRegisterMode.ContainerSingleton:
+                    case IOCRegisterMode.ContainerWeakSingleton:
                         concrete_instance = regData.load.ConcreteInstance;
                         if (concrete_instance == null)
                         {
                             concrete_instance = ResolveOnDemand(ref regData.load, resolve_load, mapping_load);
                         }
                         break;
-                    case RegisterMode.Transient:
+                    case IOCRegisterMode.Transient:
                         concrete_instance = CreateInstanceInternal(resolve_load, mapping_load);
                         break;
                 }
             }
             else // It is not registered (even in any parent). So, we reassign as transient resolution.
             {
-                resolve_load.Mode = ResolveMode.Transient;
+                resolve_load.Mode = IOCResolveMode.Transient;
                 if (resolve_load.TransientLevel == TransientCreationLevel.None) { resolve_load.TransientLevel = TransientCreationLevel.Current; }
 
                 //todo: Should we reset the mapping level as well??
@@ -193,7 +193,7 @@ namespace Haley.IOC
             {
                 //Before trying to create a transient instance, check the registered data.
                 if (registeredData.exists && (
-                    registeredData.load?.Mode == RegisterMode.UniversalSingleton ||( registeredData.load?.Mode == RegisterMode.ContainerSingleton && !registeredData.isInParentContainer)))
+                    registeredData.load?.Mode == IOCRegisterMode.UniversalSingleton ||( registeredData.load?.Mode == IOCRegisterMode.ContainerSingleton && !registeredData.isInParentContainer)))
                 {
                     //Only for weak singleton (inside same container) we should allow transient creation or else reuse the registered data. If the singleton is coming from parent container, then we should allow creation of transient.
                     concrete_instance = registeredData.load.ConcreteInstance;
@@ -208,7 +208,7 @@ namespace Haley.IOC
             }
             else
             {
-                resolve_load.Mode = ResolveMode.AsRegistered;
+                resolve_load.Mode = IOCResolveMode.AsRegistered;
                 concrete_instance = MainResolve(resolve_load, mapping_load);
             }
         }
@@ -279,7 +279,7 @@ namespace Haley.IOC
             if (resolve_load == null)
             {
                 //Convert register load to resolve load.
-                resolve_load = load.Convert(null, null, ResolveMode.AsRegistered);
+                resolve_load = load.Convert(null, null, IOCResolveMode.AsRegistered);
             }
             load.ConcreteInstance = CreateInstanceInternal(resolve_load, mapping_load); //Create instance resolving all dependencies
             return load.ConcreteInstance;
@@ -292,7 +292,7 @@ namespace Haley.IOC
             if (!IsRoot && Root != null)
             {
                 var status = Root.CheckIfRegistered(load.ContractType, load.PriorityKey);
-                if (status.status && status.load?.Mode == RegisterMode.UniversalSingleton && Root is MicroContainer mCont)
+                if (status.status && status.load?.Mode == IOCRegisterMode.UniversalSingleton && Root is MicroContainer mCont)
                 {
                     mCont.Mappings.TryGetValue(new KeyBase(load.ContractType, load.PriorityKey), out var result);
                     concrete_instance = result.ConcreteInstance; //Return the universal object directly.

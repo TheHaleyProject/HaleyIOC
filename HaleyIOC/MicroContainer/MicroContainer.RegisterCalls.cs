@@ -25,7 +25,7 @@ namespace Haley.IOC
         }
         public bool LazyRegisterWithKey<TConcrete>(string priority_key, Func<TConcrete> del =null, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class
         {
-            RegisterMode _regMode = convertMode(mode);
+            IOCRegisterMode _regMode = convertMode(mode);
             RegisterLoad _reg_load = new RegisterLoad(_regMode, priority_key, typeof(TConcrete), typeof(TConcrete), null);
             _reg_load.SetInstanceCreator(del);
 
@@ -34,7 +34,7 @@ namespace Haley.IOC
         }
         public bool LazyRegisterWithKey<TContract, TConcrete>(string priority_key, Func<TConcrete> del =null, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class, TContract
         {
-            RegisterMode _regMode = convertMode(mode);
+            IOCRegisterMode _regMode = convertMode(mode);
             RegisterLoad _reg_load = new RegisterLoad(_regMode, priority_key, typeof(TContract), typeof(TConcrete), null);
             _reg_load.SetInstanceCreator(del);
             MappingLoad _map_load = new MappingLoad();
@@ -43,7 +43,7 @@ namespace Haley.IOC
         #endregion
 
         #region Register Methods
-        public bool Register<TConcrete>(RegisterMode mode = RegisterMode.ContainerSingleton) where TConcrete : class
+        public bool Register<TConcrete>(IOCRegisterMode mode = IOCRegisterMode.ContainerSingleton) where TConcrete : class
         {
             return RegisterWithKey<TConcrete>(null, mode);
         }
@@ -59,7 +59,7 @@ namespace Haley.IOC
         {
             return RegisterWithKey<TContract, TConcrete>(null, instance, mode);
         }
-        public bool Register<TContract, TConcrete>(RegisterMode mode = RegisterMode.ContainerSingleton) where TConcrete : class, TContract
+        public bool Register<TContract, TConcrete>(IOCRegisterMode mode = IOCRegisterMode.ContainerSingleton) where TConcrete : class, TContract
         {
             return RegisterWithKey<TContract, TConcrete>(null, mode);
         }
@@ -71,7 +71,7 @@ namespace Haley.IOC
         #endregion
 
         #region RegisterWithKey Methods
-        public bool RegisterWithKey<TConcrete>(string priority_key, RegisterMode mode = RegisterMode.ContainerSingleton) where TConcrete : class
+        public bool RegisterWithKey<TConcrete>(string priority_key, IOCRegisterMode mode = IOCRegisterMode.ContainerSingleton) where TConcrete : class
         {
             
             RegisterLoad _reg_load = new RegisterLoad(mode, priority_key, typeof(TConcrete), typeof(TConcrete),null);
@@ -84,20 +84,20 @@ namespace Haley.IOC
             //For this method, both contract and concrete type are same.
             //If we have an instance, then obviously it is of singleton or forced singleton registration type.
 
-            RegisterMode _regMode = convertMode(mode);
+            IOCRegisterMode _regMode = convertMode(mode);
             RegisterLoad _reg_load = new RegisterLoad(_regMode, priority_key, typeof(TConcrete), typeof(TConcrete), instance);
             MappingLoad _map_load = new MappingLoad();
             return RegisterInternal(_reg_load,_map_load);
         }
         public bool RegisterWithKey<TConcrete>(string priority_key, IMappingProvider dependencyProvider, MappingLevel mapping_level, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class
         {
-            RegisterMode _regMode = convertMode(mode);
+            IOCRegisterMode _regMode = convertMode(mode);
             //For this method, both contract and concrete type are same.
             RegisterLoad _reg_load = new RegisterLoad(_regMode, priority_key, typeof(TConcrete), typeof(TConcrete), null);
             MappingLoad _map_load = new MappingLoad(dependencyProvider,mapping_level);
             return RegisterInternal(_reg_load,_map_load);
         }
-        public bool RegisterWithKey<TContract, TConcrete>(string priority_key, RegisterMode mode = RegisterMode.ContainerSingleton) where TConcrete : class, TContract
+        public bool RegisterWithKey<TContract, TConcrete>(string priority_key, IOCRegisterMode mode = IOCRegisterMode.ContainerSingleton) where TConcrete : class, TContract
         {
             RegisterLoad _reg_load = new RegisterLoad(mode, priority_key, typeof(TContract), typeof(TConcrete), null);
             MappingLoad _map_load = new MappingLoad();
@@ -105,14 +105,14 @@ namespace Haley.IOC
         }
         public bool RegisterWithKey<TContract, TConcrete>(string priority_key, TConcrete instance, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class, TContract
         {
-            RegisterMode _regMode = convertMode(mode);
+            IOCRegisterMode _regMode = convertMode(mode);
             RegisterLoad _reg_load = new RegisterLoad(_regMode, priority_key, typeof(TContract), typeof(TConcrete), instance);
             MappingLoad _map_load = new MappingLoad();
             return RegisterInternal(_reg_load,_map_load);
         }
         public bool RegisterWithKey<TContract, TConcrete>(string priority_key, IMappingProvider dependencyProvider, MappingLevel mapping_level, SingletonMode mode = SingletonMode.ContainerSingleton) where TConcrete : class, TContract
         {
-            RegisterMode _regMode = convertMode(mode);
+            IOCRegisterMode _regMode = convertMode(mode);
             RegisterLoad _reg_load = new RegisterLoad(_regMode, priority_key, typeof(TContract), typeof(TConcrete), null);
             MappingLoad _map_load = new MappingLoad(dependencyProvider,mapping_level);
             return RegisterInternal(_reg_load,_map_load);

@@ -16,7 +16,7 @@ namespace Haley.IOC
     {
         #region ATTRIBUTES
         //All mappings for this container
-        readonly ConcurrentDictionary<IKeyBase, RegisterLoad> Mappings = new ConcurrentDictionary<IKeyBase, RegisterLoad>();
+        readonly ConcurrentDictionary<IIOCKeyBase, RegisterLoad> Mappings = new ConcurrentDictionary<IIOCKeyBase, RegisterLoad>();
         //created children
         Func<ResolveLoad,string, object> OverrideCallBack = null;
 
@@ -93,7 +93,7 @@ namespace Haley.IOC
             }
             return _transient_level;
         }
-        private bool ExistsInCurrentContainer(IRegisterLoad register_load)
+        private bool ExistsInCurrentContainer(IIOCRegisterLoad register_load)
         {
             var _status = CheckIfRegistered(register_load.ContractType, register_load.PriorityKey);
             return _status.status; //Returns if registered.
@@ -111,18 +111,18 @@ namespace Haley.IOC
             return true;
         }
 
-        private RegisterMode convertMode(SingletonMode mode)
+        private IOCRegisterMode convertMode(SingletonMode mode)
         {
             switch (mode)
             {
                 case SingletonMode.ContainerSingleton:
-                    return RegisterMode.ContainerSingleton;
+                    return IOCRegisterMode.ContainerSingleton;
                 case SingletonMode.ContainerWeakSingleton:
-                    return RegisterMode.ContainerWeakSingleton;
+                    return IOCRegisterMode.ContainerWeakSingleton;
                 case SingletonMode.UniversalSingleton:
-                    return RegisterMode.UniversalSingleton;
+                    return IOCRegisterMode.UniversalSingleton;
             }
-            return RegisterMode.ContainerSingleton;
+            return IOCRegisterMode.ContainerSingleton;
         }
 
         private List<RegisterLoad> GetAllMappings(Type contract_type)
@@ -164,7 +164,7 @@ namespace Haley.IOC
             return getMapping(_key);
         }
 
-        private (bool exists, bool isInParentContainer, RegisterLoad load) getMapping(IKeyBase key)
+        private (bool exists, bool isInParentContainer, RegisterLoad load) getMapping(IIOCKeyBase key)
         {
             //Preference to prioritykey/contract_type combination.
             if (Mappings.ContainsKey(key))
@@ -235,13 +235,13 @@ namespace Haley.IOC
             ResolveOnlyOnDemand = flag;
         }
 
-        public (bool status, string message, IRegisterLoad load) CheckIfRegistered(IKeyBase key, bool checkInParents = false)
+        public (bool status, string message, IIOCRegisterLoad load) CheckIfRegistered(IIOCKeyBase key, bool checkInParents = false)
         {
             //Check if it is registered as an UniversalSingleton Object at the root level.
             if (Root != null && !IsRoot) //If current container is root, then we will end up in a overflow loop.
             {
                 var _rootLoad = Root.CheckIfRegistered(key);
-                if (_rootLoad.status && _rootLoad.load.Mode == RegisterMode.UniversalSingleton)
+                if (_rootLoad.status && _rootLoad.load.Mode == IOCRegisterMode.UniversalSingleton)
                 {
                     //Only if it is a universal singleton we consider that inclusive in the local mapping.
                     var message = $@"The key : {key} is registered against the type {_rootLoad.load.ConcreteType} inside the Root container as an Universal Singleton.";
@@ -264,11 +264,11 @@ namespace Haley.IOC
                 return (false, "Unable to find any registration", null);
             }
         }
-        public (bool status, string message, IRegisterLoad load) CheckIfRegistered(Type contract_type, string priority_key, bool checkInParents = false)
+        public (bool status, string message, IIOCRegisterLoad load) CheckIfRegistered(Type contract_type, string priority_key, bool checkInParents = false)
         {
             return CheckIfRegistered(new KeyBase(contract_type, priority_key), checkInParents);
         }
-        public (bool status, string message, IRegisterLoad load) CheckIfRegistered<Tcontract>(string priority_key, bool checkInParents = false)
+        public (bool status, string message, IIOCRegisterLoad load) CheckIfRegistered<Tcontract>(string priority_key, bool checkInParents = false)
         {
             return CheckIfRegistered(typeof(Tcontract), priority_key, checkInParents);
         }
